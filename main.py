@@ -84,9 +84,8 @@ def largest(list):
             max = list[i]
     return max
 
+
 # Sends SMS via Twilio API
-
-
 def send_sms(text):
     if not disable_sms:
         client.messages.create(
@@ -95,9 +94,8 @@ def send_sms(text):
             from_=twilio_number
         )
 
+
 # Methods for Alpha API Calls
-
-
 def load_pricing(new_data):
     # Load Pricing Data from API
     url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={}&interval=1min&outputsize=full&apikey={}".format(
@@ -211,9 +209,8 @@ def load_RSI(new_data):
                             int(float(json_object[category][time]["RSI"]) * multiplier))
                         rsi_time.append(time[11:])
 
+
 # Calculate Derivatives
-
-
 def update_derivatives():
     # Long EMA Derivative
     for i in range(len(derivative_long_ema), len(long_ema)):
@@ -347,8 +344,6 @@ def draw_RSI():
 
 
 # Draw lines at buy and sell signals
-
-
 def draw_transactions():
     x_scale = (canvas_width - buffer * 2) / 390
     for i in range(0, len(transactions)):
