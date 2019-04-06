@@ -30,6 +30,8 @@ file.close()
 # Target Stock Setup
 target_stock = "SPY"
 multiplier = 1000000
+short_ema_period = 60
+long_ema_period = 120
 
 # GUI Setup
 master = Tk()
@@ -118,8 +120,8 @@ def load_pricing(new_data):
                         price_time.append(time[11:16])
 
     # Load Short EMA Data from API
-    url = "https://www.alphavantage.co/query?function=EMA&symbol={}&interval=1min&time_period=60&series_type=close&apikey={}".format(
-        target_stock, alpha_api_key)
+    url = "https://www.alphavantage.co/query?function=EMA&symbol={}&interval=1min&time_period={}&series_type=close&apikey={}".format(
+        target_stock, short_ema_period, alpha_api_key)
     data = requests.get(url).text
     json_object = json.loads(data)
 
@@ -138,8 +140,8 @@ def load_pricing(new_data):
                         short_ema_time.append(time[11:16])
 
     # Load Long EMA Data from API
-    url = "https://www.alphavantage.co/query?function=EMA&symbol={}&interval=1min&time_period=120&series_type=close&apikey={}".format(
-        target_stock, alpha_api_key)
+    url = "https://www.alphavantage.co/query?function=EMA&symbol={}&interval=1min&time_period={}&series_type=close&apikey={}".format(
+        target_stock, long_ema_period, alpha_api_key)
     data = requests.get(url).text
     json_object = json.loads(data)
 
