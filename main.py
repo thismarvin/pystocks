@@ -23,7 +23,7 @@ if not disable_sms:
 
 # Alpha API Setup
 alpha_api_key = file.readline().split(" ")[1].strip()
-api_update_frequency = 20
+api_update_frequency = 60
 
 file.close()
 
