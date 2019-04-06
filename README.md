@@ -4,7 +4,7 @@ a simple stock trading strategy and its respective visualization made using pyth
 ![Image of Program](https://github.com/thismarvin/pystocks/blob/master/Preview.png)
 
 ## Features
-The program uses realtime stoack data provided by [Alpha Vantage](https://www.alphavantage.co/) to suggest entry and exit points for potential stock trades. A visualization of the target stock's pricing and various technical indicators is rendered to a simple GUI made using python's tkinter. Optionally, the program can be linked to a [Twilio Account](https://www.twilio.com/), and any suggest trades can be sent directly to your phone via SMS.
+The program uses realtime stock data provided by [Alpha Vantage](https://www.alphavantage.co/) to suggest entry and exit points for potential stock trades. A visualization of the target stock's pricing and various technical indicators is rendered to a simple GUI made using python's tkinter. Optionally, the program can be linked to a [Twilio Account](https://www.twilio.com/), and any suggest trades can be sent directly to your phone via SMS.
 
 ## Strategy
 The strategy mainly revolves around the MACD indicator, but also takes advantage of the RSI indicator and a long EMA. 
