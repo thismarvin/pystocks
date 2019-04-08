@@ -12,13 +12,13 @@ from tkinter import *
 file = open("credentials.txt", "r")
 
 # Twilio API Setup
-disable_sms = True
+enable_sms = False
 
 if len(sys.argv) == 3:
     if str(sys.argv[2]).lower() == "true":
-        disable_sms = True
+        enable_sms = True
     elif str(sys.argv[2]).lower() == "false":
-        disable_sms = False
+        enable_sms = False
 
 account_sid = file.readline().split(" ")[1].strip()
 auth_token = file.readline().split(" ")[1].strip()
@@ -26,7 +26,7 @@ twilio_number = file.readline().split(" ")[1].strip()
 your_number = file.readline().split(" ")[1].strip()
 user_set_twilio_key = False if account_sid == "your_account_sid" else True
 
-if not disable_sms:
+if enable_sms:
     if user_set_twilio_key:
         client = Client(account_sid, auth_token)
     else:
@@ -111,7 +111,7 @@ def largest(list):
 
 # Sends SMS via Twilio API
 def send_sms(text):
-    if not disable_sms:
+    if enable_sms:
         client.messages.create(
             body=text,
             to=your_number,
