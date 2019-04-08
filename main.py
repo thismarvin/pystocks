@@ -1,4 +1,5 @@
 import os
+import sys
 import datetime
 import requests
 import json
@@ -37,7 +38,10 @@ if (not user_set_alpha_api_key):
 
 
 # Target Stock Setup
-target_stock = "SPY"
+if len(sys.argv) == 1:
+    print("Your target stock was not defined; the program will default to using \"SPY\"")
+    print("Refer to the README file on instructions to define a target stock and other prerequisites")
+target_stock = "SPY" if len(sys.argv) == 1 else sys.argv[1]
 multiplier = 1000000
 short_ema_period = 60
 long_ema_period = 120
@@ -223,7 +227,7 @@ def load_RSI(new_data):
 
 def data_load_correctly():
     if len(prices) == 0 or len(short_ema) == 0 or len(long_ema) == 0 or len(macd) == 0 or len(macd_signal) == 0 or len(macd_histogram) == 0 or len(rsi) == 0:
-        print("Error loading data from Alpha Vantage API")
+        print("Error loading data from the Alpha Vantage API")
         return False
     else:
         return True
