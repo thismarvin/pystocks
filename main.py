@@ -17,15 +17,24 @@ account_sid = file.readline().split(" ")[1].strip()
 auth_token = file.readline().split(" ")[1].strip()
 twilio_number = file.readline().split(" ")[1].strip()
 your_number = file.readline().split(" ")[1].strip()
+user_set_twilio_key = False if account_sid == "your_account_sid" else True
 
 if not disable_sms:
-    client = Client(account_sid, auth_token)
+    if user_set_twilio_key:
+        client = Client(account_sid, auth_token)
+    else:
+        print("Make sure to change the default Twilio keys located in the \"credentials.txt\" file")
 
 # Alpha API Setup
 alpha_api_key = file.readline().split(" ")[1].strip()
+file.close()
+
+user_set_alpha_api_key = False if alpha_api_key == "your_alphavantage_api_key" else True
 api_update_frequency = 60
 
-file.close()
+if (not user_set_alpha_api_key):
+    print("Make sure to change the default Alpha Vantage API key located in the \"credentials.txt\" file")
+
 
 # Target Stock Setup
 target_stock = "SPY"
@@ -213,7 +222,7 @@ def load_RSI(new_data):
 
 
 def data_load_correctly():
-    if (prices.count == 0 or short_ema.count == 0 or long_ema.count == 0 or macd.count == 0 or macd_signal.count == 0 or macd_histogram.count == 0 or rsi.count == 0):
+    if len(prices) == 0 or len(short_ema) == 0 or len(long_ema) == 0 or len(macd) == 0 or len(macd_signal) == 0 or len(macd_histogram) == 0 or len(rsi) == 0:
         print("Error loading data from Alpha Vantage API")
         return False
     else:
@@ -367,9 +376,10 @@ def draw_transactions():
 
 def initialize():
     # Initialize with pre-existing data
-    load_pricing(False)
-    load_MACD(False)
-    load_RSI(False)
+    if user_set_alpha_api_key:
+        load_pricing(False)
+        load_MACD(False)
+        load_RSI(False)
 
     if data_load_correctly():
         update_derivatives()
@@ -383,9 +393,10 @@ def initialize():
 
 def update():
     # Update with new data
-    load_pricing(True)
-    load_MACD(True)
-    load_RSI(True)
+    if user_set_alpha_api_key:
+        load_pricing(True)
+        load_MACD(True)
+        load_RSI(True)
 
     if data_load_correctly():
         update_derivatives()
