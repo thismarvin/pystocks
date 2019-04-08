@@ -1,9 +1,9 @@
 import os
 import sys
+import re
 import datetime
-import requests
 import json
-import numpy as np
+import requests
 
 from twilio.rest import Client
 from tkinter import *
@@ -13,6 +13,12 @@ file = open("credentials.txt", "r")
 
 # Twilio API Setup
 disable_sms = True
+
+if len(sys.argv) == 3:
+    if str(sys.argv[2]).lower() == "true":
+        disable_sms = True
+    elif str(sys.argv[2]).lower() == "false":
+        disable_sms = False
 
 account_sid = file.readline().split(" ")[1].strip()
 auth_token = file.readline().split(" ")[1].strip()
@@ -38,13 +44,16 @@ if (not user_set_alpha_api_key):
 
 
 # Target Stock Setup
-if len(sys.argv) == 1:
-    print("Your target stock was not defined; the program will default to using \"SPY\"")
-    print("Refer to the README file on instructions to define a target stock and other prerequisites")
-target_stock = "SPY" if len(sys.argv) == 1 else sys.argv[1]
+target_stock = "SPY" if len(sys.argv) == 1 else str(sys.argv[1]).upper()
 multiplier = 1000000
 short_ema_period = 60
 long_ema_period = 120
+
+if len(sys.argv) == 1:
+    print("Your target stock was not defined; the program will default to using \"SPY\"")
+    print("Refer to the README file on instructions to define a target stock and other prerequisites")
+if len(target_stock) > 4 or re.search("\d", target_stock):
+    print("The target stock you entered is not valid, defaulting to \"SPY\"")
 
 # GUI Setup
 master = Tk()
