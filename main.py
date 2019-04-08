@@ -212,6 +212,14 @@ def load_RSI(new_data):
                         rsi_time.append(time[11:])
 
 
+def data_load_correctly():
+    if (prices.count == 0 or short_ema.count == 0 or long_ema.count == 0 or macd.count == 0 or macd_signal.count == 0 or macd_histogram.count == 0 or rsi.count == 0):
+        print("Error loading data from Alpha Vantage API")
+        return False
+    else:
+        return True
+
+
 # Calculate Derivatives
 def update_derivatives():
     # Long EMA Derivative
@@ -358,31 +366,36 @@ def draw_transactions():
 
 
 def initialize():
-    # Update Data
+    # Initialize with pre-existing data
     load_pricing(False)
     load_MACD(False)
     load_RSI(False)
-    update_derivatives()
-    update_bot()
-    # Draw Data
-    draw_pricing()
-    draw_MACD()
-    draw_RSI()
-    draw_transactions()
+
+    if data_load_correctly():
+        update_derivatives()
+        update_bot()
+        # Draw Data
+        draw_pricing()
+        draw_MACD()
+        draw_RSI()
+        draw_transactions()
 
 
 def update():
-    # Update Data
+    # Update with new data
     load_pricing(True)
     load_MACD(True)
     load_RSI(True)
-    update_derivatives()
 
-    # Clear and redraw data
-    w.delete("all")
-    draw_pricing()
-    draw_MACD()
-    draw_transactions()
+    if data_load_correctly():
+        update_derivatives()
+        update_bot()
+        # Clear and redraw data
+        w.delete("all")
+        draw_pricing()
+        draw_MACD()
+        draw_RSI()
+        draw_transactions()
 
     master.after(1000 * api_update_frequency, update)
 
