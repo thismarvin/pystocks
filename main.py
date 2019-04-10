@@ -330,9 +330,13 @@ def draw_pricing():
 
 # Scale MACD Values
 def macd_scaled(value):
-    range = largest(macd) + abs(smallest(macd))
-    value += abs(smallest(macd))
-    return canvas_height - (value * chart_height / 2 / range) - chart_height / 2 - buffer
+    mins = [smallest(macd), smallest(macd_signal)]
+    min = abs(smallest(mins))
+    maxs = [largest(macd), largest(macd_signal)]
+    max = abs(largest(maxs))
+    range = max + min
+    value += min
+    return canvas_height - (value * chart_height * 0.6 / range) - chart_height * 0.4 - buffer
 
 
 def draw_MACD():
@@ -355,9 +359,10 @@ def draw_MACD():
 
 # Scale RSI Values
 def rsi_scaled(value):
-    range = largest(rsi) - smallest(rsi)
     min = smallest(rsi) if smallest(rsi) < 30 * multiplier else 30 * multiplier
-    return canvas_height - ((value - min) * chart_height * 0.4 / range) - buffer
+    max = largest(rsi) if largest(rsi) < 80 * multiplier else 80 * multiplier    
+    range = max - min
+    return canvas_height - ((value - min) * chart_height * 0.35 / range) - buffer
 
 
 def draw_RSI():
