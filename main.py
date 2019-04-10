@@ -426,7 +426,8 @@ def update():
         draw_RSI()
         draw_transactions()
 
-    master.after(1000 * api_update_frequency, update)
+    if len(prices) < 390:
+        master.after(1000 * api_update_frequency, update)
 
 
 # Initialize Chart
