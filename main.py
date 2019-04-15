@@ -49,7 +49,7 @@ alpha_api_key = file.readline().split(" ")[1].strip()
 file.close()
 
 user_set_alpha_api_key = False if alpha_api_key == "your_alphavantage_api_key" else True
-api_update_frequency = 20
+api_update_frequency = 60
 
 if (not user_set_alpha_api_key):
     print("Make sure to change the default Alpha Vantage API key located in the \"credentials.txt\" file")
