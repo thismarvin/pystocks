@@ -8,10 +8,21 @@ import requests
 from twilio.rest import Client
 from tkinter import *
 
-# Load Credentials
-file = open("credentials.txt", "r")
+#region GUI Setup
+master = Tk()
+master.title("Advanced Stock Trading AI 3000")
+canvas_width = 320 * 2
+canvas_height = 180 * 2
+w = Canvas(master, width=canvas_width, height=canvas_height)
+w.configure(background='black')
+w.pack()
+#endregion
 
-# Twilio API Setup
+#region Load Credentials
+file = open("credentials.txt", "r")
+#endregion
+
+#region Twilio API Setup
 enable_sms = False
 
 if len(sys.argv) == 3:
@@ -31,43 +42,39 @@ if enable_sms:
         client = Client(account_sid, auth_token)
     else:
         print("Make sure to change the default Twilio keys located in the \"credentials.txt\" file")
+#endregion
 
-# Alpha API Setup
+#region Alpha API Setup
 alpha_api_key = file.readline().split(" ")[1].strip()
 file.close()
 
 user_set_alpha_api_key = False if alpha_api_key == "your_alphavantage_api_key" else True
-api_update_frequency = 60
+api_update_frequency = 20
 
 if (not user_set_alpha_api_key):
     print("Make sure to change the default Alpha Vantage API key located in the \"credentials.txt\" file")
+#endregion
 
+#region Get Today's Date
+date = datetime.datetime.now().strftime("%Y-%m-%d")
+#endregion
 
-# Target Stock Setup
+#region Target Stock Setup
 target_stock = "SPY" if len(sys.argv) == 1 else str(sys.argv[1]).upper()
+target_profit = 0.0015
+maximum_loss = 0.002
+short_ema_period = 12 * 5
+long_ema_period = 26 * 5
 multiplier = 1000000
-short_ema_period = 60
-long_ema_period = 120
 
 if len(sys.argv) == 1:
     print("Your target stock was not defined; the program will default to using \"SPY\"")
     print("Refer to the README file on instructions to define a target stock and other prerequisites")
 if len(target_stock) > 4 or re.search("\d", target_stock):
     print("The target stock you entered is not valid, defaulting to \"SPY\"")
+#endregion
 
-# GUI Setup
-master = Tk()
-master.title("Advanced Stock Trading AI 3000")
-canvas_width = 320 * 2
-canvas_height = 180 * 2
-w = Canvas(master, width=canvas_width, height=canvas_height)
-w.configure(background='black')
-w.pack()
-
-# Get Today's Date
-date = datetime.datetime.now().strftime("%Y-%m-%d")
-
-# Initialize Lists
+#region Initialize Lists
 price_time = []
 prices = []
 short_ema_time = []
@@ -86,11 +93,12 @@ derivative_macd = [0]
 derivative_macd_signal = [0]
 
 transactions = []
+#endregion
 
-# Initialize Chart variables
+#region Initialize Chart variables
 buffer = canvas_width * 0.05
 chart_height = (canvas_height - buffer * 2) / 2
-
+#endregion
 
 # Helper Methods
 def smallest(list):
@@ -268,10 +276,10 @@ def update_bot():
             (i > transactions[-1] if len(transactions) > 0 else True) and
             i > 60 and
             i < 390 - 30 and
+            macd[int(i / 5) - 1] < macd_signal[int(i / 5) - 1] and           
             float(derivative_long_ema[i] / multiplier) > -0.05 and
-            float(derivative_macd[int(i / 5) - 1] / multiplier) > 0 and
-            float(derivative_macd_signal[int(i / 5) - 1] / multiplier) > 0 and
-            float(macd_histogram[int(i / 5) - 1] / multiplier) >= 0.025 and
+            float(derivative_macd[int(i / 5) - 1] / multiplier) >= 0.002 and
+            float(derivative_macd_signal[int(i / 5) - 1] / multiplier) > -0.05 and
             float(rsi[int(i / 5) - 1] / multiplier) <= 60
         ):
             action = ("Buy at {} EST for ${}").format(
@@ -285,11 +293,12 @@ def update_bot():
             (i > transactions[-1] if len(transactions) > 0 else True) and
             (
                 i >= 389 or
+                prices[i] >= prices[transactions[-1]] * (1 + target_profit) or
+                prices[i] <= prices[transactions[-1]] * (1 - maximum_loss) or
                 (
-                    macd[int(i / 5) - 1] < macd_signal[int(i / 5) - 1] and
-                    float(derivative_macd[int(i / 5) - 1] / multiplier) < 0 and
-                    float(derivative_macd_signal[int(
-                        i / 5) - 1] / multiplier) < 0
+                    float(derivative_long_ema[i] / multiplier) <= -0.05 and
+                    float(derivative_macd[int(i / 5) - 1] / multiplier) <= -0.05 and
+                    float(derivative_macd_signal[int(i / 5) - 1] / multiplier) <= -0.05
                 )
             )
         ):
@@ -360,7 +369,7 @@ def draw_MACD():
 # Scale RSI Values
 def rsi_scaled(value):
     min = smallest(rsi) if smallest(rsi) < 30 * multiplier else 30 * multiplier
-    max = largest(rsi) if largest(rsi) < 80 * multiplier else 80 * multiplier    
+    max = largest(rsi) if largest(rsi) < 80 * multiplier else 80 * multiplier
     range = max - min
     return canvas_height - ((value - min) * chart_height * 0.35 / range) - buffer
 
