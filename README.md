@@ -21,6 +21,8 @@ The program takes in two command line arguments. The first argument `Stock_Symbo
 ## Strategy
 The strategy mainly revolves around the MACD indicator, but also takes advantage of the RSI indicator and a long EMA. 
 
-A buy signal is detected when both the MACD value and MACD Signal are negative and increasing. Once a buy signal is detected it will be confirmed if the long EMA appears to be increasing, the last value of the MACD Histogram is above a certain threshold, and the RSI indicator is less than a certain threshold. A sell signal is detected when both the MACD value and MACD Signal are decreasing and the MACD value is less than the MACD Signal. By default the strategy will suggest a buy signal between 10:30 AM EST and 3:30 PM EST. A sell signal will be suggested at any time as long as a buy signal exists prior. This is a day trading strategy, so a sell signal will be suggested at close if a buy signal has not been closed yet.
+A buy signal is detected when the MACD value is less than the MACD Signal, the MACD value is increasing, and the MACD Signal appears to be starting to increase. Once a buy signal is detected it will be confirmed if the long EMA appears to be starting to increase and the RSI indicator is less than 60. A sell signal is detected if your target profit is reached, your maximum loss risk is reached, or when the MACD value, the MACD Signal, and the long EMA are decreasing. 
 
-In general the strategy seems to provide decent entry points, but slightly late exit points. **Results may vary across different stocks**. Tweaks to the strategy are encouraged!
+By default the strategy will suggest a buy signal between 10:30 AM EST and 3:30 PM EST. A sell signal will be suggested at any time as long as a buy signal exists prior. This is a day trading strategy, so a sell signal will be suggested at close if a buy signal has not been closed yet.
+
+**Only invest as much money as you are willing to lose**. Technical Analysis is not always right. In fact, tweaking this strategy is encouraged!
