@@ -8,7 +8,7 @@ import requests
 from twilio.rest import Client
 from tkinter import *
 
-#region GUI Setup
+# region GUI Setup
 master = Tk()
 master.title("Advanced Stock Trading AI 3000")
 canvas_width = 320 * 2
@@ -16,13 +16,13 @@ canvas_height = 180 * 2
 w = Canvas(master, width=canvas_width, height=canvas_height)
 w.configure(background='black')
 w.pack()
-#endregion
+# endregion
 
-#region Load Credentials
+# region Load Credentials
 file = open("credentials.txt", "r")
-#endregion
+# endregion
 
-#region Twilio API Setup
+# region Twilio API Setup
 enable_sms = False
 
 if len(sys.argv) == 3:
@@ -42,9 +42,9 @@ if enable_sms:
         client = Client(account_sid, auth_token)
     else:
         print("Make sure to change the default Twilio keys located in the \"credentials.txt\" file")
-#endregion
+# endregion
 
-#region Alpha API Setup
+# region Alpha API Setup
 alpha_api_key = file.readline().split(" ")[1].strip()
 file.close()
 
@@ -53,13 +53,13 @@ api_update_frequency = 60
 
 if (not user_set_alpha_api_key):
     print("Make sure to change the default Alpha Vantage API key located in the \"credentials.txt\" file")
-#endregion
+# endregion
 
-#region Get Today's Date
+# region Get Today's Date
 date = datetime.datetime.now().strftime("%Y-%m-%d")
-#endregion
+# endregion
 
-#region Target Stock Setup
+# region Target Stock Setup
 target_stock = "SPY" if len(sys.argv) == 1 else str(sys.argv[1]).upper()
 target_profit = 0.0015
 maximum_loss = 0.002
@@ -72,15 +72,16 @@ if len(sys.argv) == 1:
     print("Refer to the README file on instructions to define a target stock and other prerequisites")
 if len(target_stock) > 4 or re.search("\d", target_stock):
     print("The target stock you entered is not valid, defaulting to \"SPY\"")
-#endregion
+# endregion
 
-#region Initialize Lists
+# region Initialize Lists
 price_time = []
 prices = []
 short_ema_time = []
 short_ema = []
 long_ema_time = []
 long_ema = []
+volume = []
 macd = []
 macd_signal = []
 macd_histogram = []
@@ -93,12 +94,12 @@ derivative_macd = [0]
 derivative_macd_signal = [0]
 
 transactions = []
-#endregion
+# endregion
 
-#region Initialize Chart variables
+# region Initialize Chart variables
 buffer = canvas_width * 0.05
 chart_height = (canvas_height - buffer * 2) / 2
-#endregion
+# endregion
 
 # Helper Methods
 def smallest(list):
@@ -144,10 +145,14 @@ def load_pricing(new_data):
                         prices.insert(
                             0, int(float(json_object[category][time]["4. close"]) * multiplier))
                         price_time.insert(0, time[11:16])
+                        volume.insert(
+                            0, int((json_object[category][time]["5. volume"])))
                     else:
                         prices.append(
                             int(float(json_object[category][time]["4. close"]) * multiplier))
                         price_time.append(time[11:16])
+                        volume.append(
+                            int((json_object[category][time]["5. volume"])))
 
     # Load Short EMA Data from API
     url = "https://www.alphavantage.co/query?function=EMA&symbol={}&interval=1min&time_period={}&series_type=close&apikey={}".format(
@@ -276,7 +281,7 @@ def update_bot():
             (i > transactions[-1] if len(transactions) > 0 else True) and
             i > 60 and
             i < 390 - 30 and
-            macd[int(i / 5) - 1] < macd_signal[int(i / 5) - 1] and           
+            macd[int(i / 5) - 1] < macd_signal[int(i / 5) - 1] and
             float(derivative_long_ema[i] / multiplier) > -0.05 and
             float(derivative_macd[int(i / 5) - 1] / multiplier) >= 0.002 and
             float(derivative_macd_signal[int(i / 5) - 1] / multiplier) > -0.05 and
@@ -298,7 +303,8 @@ def update_bot():
                 (
                     float(derivative_long_ema[i] / multiplier) <= -0.05 and
                     float(derivative_macd[int(i / 5) - 1] / multiplier) <= -0.05 and
-                    float(derivative_macd_signal[int(i / 5) - 1] / multiplier) <= -0.05
+                    float(derivative_macd_signal[int(
+                        i / 5) - 1] / multiplier) <= -0.05
                 )
             )
         ):
@@ -309,7 +315,29 @@ def update_bot():
             transactions.append(i)
 
 
-# Scale Y Pricing Values
+def volume_scaled(value):
+    maxs = []
+    sum = 0
+    for i in range(0, len(volume)):
+        sum += volume[i]
+        if i > 0 and i % 5 == 0:
+            maxs.append(sum)
+            sum = 0
+    max = largest(maxs)
+    return canvas_height - (value * chart_height * 0.5 / max) - chart_height - buffer
+
+
+def draw_volume():
+    x_scale = (canvas_width - buffer * 2) / (390)
+    sum = 0
+    for i in range(0, len(volume)):
+        sum += volume[i]
+        if i > 0 and i % 5 == 0:
+            w.create_rectangle((i) * x_scale + buffer, volume_scaled(0), (i - 5) * x_scale + buffer,
+                               volume_scaled(sum), fill="#232323")
+            sum = 0
+
+
 def pricing_scaled(price):
     mins = [smallest(prices), smallest(short_ema), smallest(long_ema)]
     maxs = [largest(prices), largest(short_ema), largest(long_ema)]
@@ -337,7 +365,6 @@ def draw_pricing():
             i) * x_scale + buffer, pricing_scaled(long_ema[i]), fill="#FFA300", width=2)
 
 
-# Scale MACD Values
 def macd_scaled(value):
     mins = [smallest(macd), smallest(macd_signal)]
     min = abs(smallest(mins))
@@ -366,10 +393,9 @@ def draw_MACD():
                   macd_scaled(0), fill="#FFFFFF", width=1)
 
 
-# Scale RSI Values
 def rsi_scaled(value):
     min = smallest(rsi) if smallest(rsi) < 30 * multiplier else 30 * multiplier
-    max = largest(rsi) if largest(rsi) < 80 * multiplier else 80 * multiplier
+    max = largest(rsi) if largest(rsi) > 80 * multiplier else 80 * multiplier
     range = max - min
     return canvas_height - ((value - min) * chart_height * 0.35 / range) - buffer
 
@@ -412,6 +438,7 @@ def initialize():
         update_derivatives()
         update_bot()
         # Draw Data
+        draw_volume()
         draw_pricing()
         draw_MACD()
         draw_RSI()
@@ -430,6 +457,7 @@ def update():
         update_bot()
         # Clear and redraw data
         w.delete("all")
+        draw_volume()
         draw_pricing()
         draw_MACD()
         draw_RSI()
