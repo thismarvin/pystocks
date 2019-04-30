@@ -61,8 +61,8 @@ date = datetime.datetime.now().strftime("%Y-%m-%d")
 
 # region Target Stock Setup
 target_stock = "SPY" if len(sys.argv) == 1 else str(sys.argv[1]).upper()
-target_profit = 0.0015
-maximum_loss = 0.002
+target_profit = 0.002
+maximum_loss = 0.001
 short_ema_period = 12 * 5
 long_ema_period = 26 * 5
 multiplier = 1000000
@@ -279,13 +279,13 @@ def update_bot():
             len(transactions) % 2 == 0 and
             i not in transactions and
             (i > transactions[-1] if len(transactions) > 0 else True) and
-            i > 60 and
-            i < 390 - 30 and
-            macd[int(i / 5) - 1] < macd_signal[int(i / 5) - 1] and
+            i >= 59 and
+            i < 389 - 30 and
+            (i >= 4 and macd[int((i + 1) / 5) - 1] < macd_signal[int((i + 1) / 5) - 1]) and
             float(derivative_long_ema[i] / multiplier) > -0.05 and
-            float(derivative_macd[int(i / 5) - 1] / multiplier) >= 0.002 and
-            float(derivative_macd_signal[int(i / 5) - 1] / multiplier) > -0.05 and
-            float(rsi[int(i / 5) - 1] / multiplier) <= 60
+            float(derivative_macd[int((i + 1) / 5) - 1] / multiplier) >= 0.002 and
+            float(derivative_macd_signal[int((i + 1) / 5) - 1] / multiplier) > -0.05 and
+            float(rsi[int((i + 1) / 5) - 1] / multiplier) <= 60
         ):
             action = ("Buy at {} EST for ${}").format(
                 price_time[i][:5], float(prices[i]) / multiplier)
@@ -302,9 +302,9 @@ def update_bot():
                 prices[i] <= prices[transactions[-1]] * (1 - maximum_loss) or
                 (
                     float(derivative_long_ema[i] / multiplier) <= -0.05 and
-                    float(derivative_macd[int(i / 5) - 1] / multiplier) <= -0.05 and
+                    float(derivative_macd[int((i + 1) / 5) - 1] / multiplier) <= -0.05 and
                     float(derivative_macd_signal[int(
-                        i / 5) - 1] / multiplier) <= -0.05
+                        (i + 1) / 5) - 1] / multiplier) <= -0.05
                 )
             )
         ):
@@ -313,6 +313,16 @@ def update_bot():
             print(action)
             send_sms(action)
             transactions.append(i)
+
+
+def save_todays_data():
+    file = open(date + ".txt", "w")
+    str = ""
+    for i in range(0, len(prices)):
+        str = ("{} {} {} {} {} {} {}\n").format(i + 1, float(prices[i] / multiplier), float(short_ema[i] / multiplier), float(
+            long_ema[i] / multiplier), volume[i], float((macd[int((i + 1) / 5) - 1] - macd_signal[int((i + 1) / 5) - 1]) / multiplier) if i > 3 else 0, float(rsi[int((i + 1) / 5) - 1] / multiplier) if i > 3 else 0)
+        file.write(str)
+    file.close()
 
 
 def volume_scaled(value):
@@ -444,6 +454,8 @@ def initialize():
         draw_RSI()
         draw_transactions()
 
+        save_todays_data()
+
 
 def update():
     # Update with new data
@@ -462,6 +474,8 @@ def update():
         draw_MACD()
         draw_RSI()
         draw_transactions()
+        
+        save_todays_data()
 
     if len(prices) < 390:
         master.after(1000 * api_update_frequency, update)
