@@ -376,9 +376,9 @@ def draw_pricing():
 
 
 def macd_scaled(value):
-    mins = [smallest(macd), smallest(macd_signal)]
+    mins = [smallest(macd), smallest(macd_signal), smallest(macd_histogram), 0]
     min = abs(smallest(mins))
-    maxs = [largest(macd), largest(macd_signal)]
+    maxs = [largest(macd), largest(macd_signal), largest(macd_histogram)]
     max = abs(largest(maxs))
     range = max + min
     value += min
@@ -474,7 +474,7 @@ def update():
         draw_MACD()
         draw_RSI()
         draw_transactions()
-        
+
         save_todays_data()
 
     if len(prices) < 390:
