@@ -141,7 +141,7 @@ def send_sms(text):
 
 
 # Methods for Alpha API Calls
-def load_pricing(new_data):
+def load_pricing():
     # Load Pricing Data from API
     url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={}&interval=1min&outputsize=full&apikey={}".format(
         target_stock, alpha_api_key)
@@ -190,7 +190,7 @@ def load_pricing(new_data):
                     long_ema_time[time_index(time[11:16])] = time[11:16]
 
 
-def load_MACD(new_data):
+def load_MACD():
     # Load MACD Data from API
     url = "https://www.alphavantage.co/query?function=MACD&symbol={}&interval=5min&series_type=close&apikey={}".format(
         target_stock, alpha_api_key)
@@ -211,7 +211,7 @@ def load_MACD(new_data):
                     macd_time[int(time_index(time[11:16]) / 5)] = time[11:]
 
 
-def load_RSI(new_data):
+def load_RSI():
     # Load RSI Data from API
     url = "https://www.alphavantage.co/query?function=RSI&symbol={}&interval=5min&time_period=10&series_type=close&apikey={}".format(
         target_stock, alpha_api_key)
@@ -336,10 +336,10 @@ def draw_volume():
     for i in range(0, len(volume)):
         if volume[i] != None:
             sum += volume[i]
-            if i > 0 and i % 5 == 0:
-                w.create_rectangle((i) * x_scale + buffer, volume_scaled(0), (i - 5) * x_scale + buffer,
-                                   volume_scaled(sum), fill="#232323")
-                sum = 0
+        if i > 0 and i % 5 == 0:
+            w.create_rectangle((i) * x_scale + buffer, volume_scaled(0),
+                               (i - 5) * x_scale + buffer, volume_scaled(sum), fill="#232323")
+            sum = 0
 
 
 def pricing_scaled(price):
@@ -437,33 +437,12 @@ def draw_transactions():
                           * x_scale + buffer, canvas_height - buffer, fill="#D800CC", width=2)
 
 
-def initialize():
-    # Initialize with pre-existing data
-    if user_set_alpha_api_key:
-        load_pricing(False)
-        load_MACD(False)
-        load_RSI(False)
-
-    if data_load_correctly():
-        update_derivatives()
-        update_bot()
-        update_title()
-        # Draw Data
-        draw_volume()
-        draw_pricing()
-        draw_MACD()
-        draw_RSI()
-        draw_transactions()
-
-        save_todays_data()
-
-
 def update():
     # Update with new data
     if user_set_alpha_api_key:
-        load_pricing(True)
-        load_MACD(True)
-        load_RSI(True)
+        load_pricing()
+        load_MACD()
+        load_RSI()
 
     if data_load_correctly():
         update_derivatives()
@@ -484,7 +463,7 @@ def update():
 
 
 # Initialize Chart
-initialize()
+update()
 
 # Update Chart
 master.after(1000 * api_update_frequency, update)
