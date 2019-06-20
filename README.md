@@ -25,9 +25,9 @@ The program takes in two command line arguments. The first argument `Stock_Symbo
 The strategy described below is inspired by an [Investopedia](https://www.investopedia.com/articles/active-trading/101014/basics-algorithmic-trading-concepts-and-examples.asp) article on algorithmic trading. The purpose of this project is to provide a foundation of sorts to allow you to create and tweak your own strategy. There are plenty of technical indicators to consider and explore, so please rummage around the code and add or remove whatever you seem fit!
 
 ## Example Strategy
-This example strategy mainly revolves around the MACD indicator, but also takes advantage of the RSI indicator and a long EMA.
+This example strategy mainly revolves around the MACD indicator, but also takes advantage of the RSI, VWAP, and EMA indicators.
 
-A buy signal is detected when the MACD value is less than the MACD Signal, the MACD value is increasing, and the MACD Signal appears to be starting to increase. Once a buy signal is detected it will be confirmed if the long EMA appears to be starting to increase and the RSI indicator is less than 60. A sell signal is detected if your target profit is reached, your maximum loss risk is reached, or when the MACD value, the MACD Signal, and the long EMA are decreasing.
+A buy signal is detected when the MACD value is less than the MACD Signal, the MACD value is increasing, and the MACD Signal appears to be starting to increase. Once a buy signal is detected it will be confirmed if the stock's price is below its VWAP, the long EMA appears to be starting to increase and the RSI indicator is less than 60. A sell signal is detected if your target profit is reached, your maximum loss risk is reached, or when the MACD value, the MACD Signal, and the long EMA are decreasing.
 
 By default the strategy will suggest a buy signal between 10:30 AM EST and 3:30 PM EST. A sell signal will be suggested at any time as long as a buy signal exists prior. This is a day trading strategy, so a sell signal will be suggested at close if a buy signal has not been closed yet.
 
