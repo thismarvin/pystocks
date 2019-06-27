@@ -6,7 +6,7 @@ import json
 import requests
 from pytz import timezone
 from twilio.rest import Client
-from tkinter import *
+from tkinter import Tk, Canvas
 
 # region GUI Setup
 master = Tk()
