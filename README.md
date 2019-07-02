@@ -12,6 +12,14 @@ This is not investment advice. Please do your own research and testing before ev
 
 The program uses real time stock data provided by [Alpha Vantage](https://www.alphavantage.co/) to suggest entry and exit points for potential stock trades. A visualization of the target stock's pricing and various technical indicators is rendered to a simple GUI made using python's tkinter. Optionally, the program can be linked to a [Twilio Account](https://www.twilio.com/), and any suggested trades can be sent directly to your phone via SMS.
 
+## Requirements
+
+- requests
+- twilio
+- pytz
+
+`pip install -r /path/to/requirements.txt`
+
 ## Initial Setup
 
 Before taking advantage of the strategy, make sure to fill the `credentials.txt` file with your API keys. [Alpha Vantage](https://www.alphavantage.co/) provides a free API key, but the key is limited to 5 API calls per min and 500 API per day. Make sure to tweak the frequency at which the API is called to fit your needs by modifying the `api_update_frequency` variable (By default the API is called 5 times every minute). SMS Alerts are disabled by default, but they can be enabled after setting up a free [Twilio Account](https://www.twilio.com/) and entering the required information from your account.
@@ -21,11 +29,6 @@ Before taking advantage of the strategy, make sure to fill the `credentials.txt`
 The program takes in two command line arguments. The first argument `Stock_Symbol` is your target stock, and the second argument `Enable_SMS_Alerts` is a boolean to toggle SMS Alerts from your [Twilio Account](https://www.twilio.com/)
 
 `python main.py Stock_Symbol Enable_SMS_Alerts`
-
-## Requirements
-
-- requests
-- twilio
 
 ## Background
 
