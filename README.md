@@ -6,7 +6,7 @@ a simple stock trading strategy and its respective visualization made using pyth
 
 ## Disclaimer
 
-This is not investment advice. Please do your own research and testing before even considering actually using this as a legitimate trading tool. I created this project as a means to become more familiar with the stock market and Python. In other words, I do not know what I am doing, and quite frankly I would not but too much faith into my code or the simple example strategy included.
+This is not investment advice. Please do your own research and testing before even considering actually using this as a legitimate trading tool. I created this project as a means to become more familiar with the stock market and Python. In other words, I do not know what I am doing, and quite frankly I would not put too much faith into my code or the simple example strategy included.
 
 ## Features
 
